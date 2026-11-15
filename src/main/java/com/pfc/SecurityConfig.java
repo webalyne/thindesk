@@ -1,32 +1,40 @@
 package com.pfc;
 
+import java.time.Clock;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
-@EnableWebSecurity
 public class SecurityConfig {
+    @Bean
+    Clock clock() { return Clock.systemUTC(); }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/css/**", "/dist/**", "/plugins/**", "/js/**", "/images/**").permitAll() // Permitir acesso à página de login e arquivos estáticos
-                .anyRequest().authenticated() // Exigir autenticação para qualquer outra página
-            )
-            .formLogin(form -> form
-                .loginPage("/login") // Definir a URL da página de login personalizada
-                .defaultSuccessUrl("/", true) // Redirecionar para /home após login bem-sucedido
-                .permitAll() // Permitir que todos acessem a página de login
-            )
-            .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout") // Redirecionar para o login após logout
-            );
+    SecurityFilterChain securityFilterChain(HttpSecurity http, ObjectMapper json) throws Exception {
+        var apiMatcher = new AntPathRequestMatcher("/api/**");
+        http.authorizeHttpRequests(auth -> auth
+                .requestMatchers("/login", "/css/**", "/js/**", "/images/**", "/error").permitAll()
+                .anyRequest().authenticated())
+            .csrf(Customizer.withDefaults())
+            .formLogin(form -> form.loginPage("/login").defaultSuccessUrl("/dashboard", true).permitAll())
+            .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/login?logout"))
+            .exceptionHandling(errors -> errors
+                .defaultAuthenticationEntryPointFor((req, res, ex) -> {
+                    res.setStatus(HttpStatus.UNAUTHORIZED.value());
+                    res.setContentType("application/json;charset=UTF-8");
+                    json.writeValue(res.getWriter(), java.util.Map.of("codigo", "NAO_AUTENTICADO", "mensagem", "Entre no sistema para continuar."));
+                }, apiMatcher)
+                .accessDeniedHandler((req, res, ex) -> {
+                    res.setStatus(HttpStatus.FORBIDDEN.value());
+                    res.setContentType("application/json;charset=UTF-8");
+                    json.writeValue(res.getWriter(), java.util.Map.of("codigo", "ACESSO_NEGADO", "mensagem", "Sessão ou token de segurança inválido. Atualize a página."));
+                }));
         return http.build();
     }
 }
