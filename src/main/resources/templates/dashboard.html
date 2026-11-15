@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="_csrf" th:content="${_csrf.token}">
+  <meta name="_csrf_header" th:content="${_csrf.headerName}">
+  <title>Thindesk | Administração</title>
+  <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+  <script type="module" th:src="@{/js/dashboard.js}"></script>
+</head>
+<body th:attr="data-pagina=${pagina}">
+<a class="skip" href="#conteudo">Ir para o conteúdo</a>
+<aside class="sidebar">
+  <a class="brand" th:href="@{/dashboard}"><span class="brand-mark">th.</span><span>thindesk<small>GESTÃO DE ATENDIMENTOS</small></span></a>
+  <div class="workspace"><span class="workspace-symbol">T</span><div>Central de suporte<small>Ambiente administrativo</small></div></div>
+  <p class="nav-caption">PRINCIPAL</p>
+  <nav aria-label="Navegação principal">
+    <a th:href="@{/dashboard}" th:classappend="${pagina == 'dashboard'} ? 'active'"><span class="nav-symbol">▦</span>Dashboard</a>
+    <a th:href="@{/chamados}" th:classappend="${pagina == 'chamados'} ? 'active'"><span class="nav-symbol">≡</span>Chamados</a>
+    <a th:href="@{/clientes}"><span class="nav-symbol">◉</span>Clientes</a>
+    <a th:href="@{/ajustes-horarios}"><span class="nav-symbol">◷</span>Horários de atendimento</a>
+  </nav>
+  <div class="sidebar-footer"><span class="avatar">AD</span><div th:text="${nomeUsuario}">Administração</div><form th:action="@{/logout}" method="post"><button type="submit" title="Sair do sistema">Sair</button></form></div>
+</aside>
+<div class="shell">
+<header class="topbar"><span>Operação <span class="divider">/</span><strong th:text="${pagina == 'chamados' ? 'Chamados' : 'Dashboard'}">Dashboard</strong></span><span id="hoje"></span></header>
+<main id="conteudo" tabindex="-1">
+  <div class="heading"><div><p class="eyebrow">CENTRAL DE SUPORTE</p><h1 th:text="${pagina == 'chamados' ? 'Chamados' : 'Visão da operação'}">Visão da operação</h1><p>Acompanhe os atendimentos e o andamento da equipe.</p></div><button class="button primary" id="novo">+ Novo chamado</button></div>
+  <section class="filters" aria-label="Filtros de consulta"><form id="filtros">
+    <div class="filter-top"><div class="dates"><label>De<input type="date" name="inicio" id="inicio" required></label><span>—</span><label>Até<input type="date" name="fim" id="fim" required></label></div><div class="shortcuts"><button type="button" data-dias="7">7 dias</button><button type="button" class="selected" data-dias="30">30 dias</button><button type="button" data-dias="90">90 dias</button></div><div class="sync"><span id="atualizacao" aria-live="polite">Carregando dados…</span><button type="button" id="atualizar" aria-label="Atualizar dados" title="Atualizar">↻</button></div></div>
+    <div class="filter-fields"><label>Status<select name="status"><option value="">Todos os status</option><option value="ABERTO">Aberto</option><option value="EM_ANDAMENTO">Em andamento</option><option value="CONCLUIDO">Concluído</option></select></label><label>Tipo<select name="tipo" id="tipo-filtro"><option value="">Todos os tipos</option></select></label><label>Técnico<select name="tecnico" id="tecnico-filtro"><option value="">Todos os técnicos</option></select></label><label>Usuário<select name="usuario" id="usuario-filtro"><option value="">Todos os usuários</option></select></label><button class="button secondary" type="submit">Aplicar</button><button class="text-button" type="button" id="limpar">Limpar</button></div>
+  </form></section>
+  <div class="error" id="erro" role="alert" hidden><span></span><button id="tentar" class="text-button">Tentar novamente</button></div>
+  <div id="dados" aria-busy="true">
+  <section class="metrics" aria-label="Indicadores gerais">
+    <article class="metric"><span>Chamados no período <i>01</i></span><strong id="total">—</strong><small>Pela data de abertura</small></article>
+    <article class="metric"><span>Abertos <i class="dot amber"></i></span><strong id="abertos">—</strong><small>Aguardando início do atendimento</small></article>
+    <article class="metric"><span>Em andamento <i class="dot blue"></i></span><strong id="andamento">—</strong><small>Atendimentos em execução</small></article>
+    <article class="metric featured"><span>Atendidos no período <i class="dot green"></i></span><strong id="atendidos">—</strong><small>Pela data de conclusão</small></article>
+  </section>
+  <div class="charts">
+    <section class="panel"><div class="panel-head"><div><h2>Atendimentos por período</h2><p>Chamados concluídos, pela data de conclusão</p></div><label><span class="sr-only">Agrupar gráfico</span><select id="agrupamento" name="agrupamento" form="filtros"><option value="dia">Por dia</option><option value="semana">Por semana</option><option value="mes">Por mês</option></select></label></div><div class="chart" id="grafico"></div><div class="chart-footer"><span><i class="dot green"></i> Atendidos</span><span>Tempo médio de resolução <strong id="tempo">—</strong></span></div><details><summary>Consultar os valores do gráfico</summary><div class="table-scroll"><table><thead><tr><th>Período</th><th>Atendidos</th></tr></thead><tbody id="serie-tabela"></tbody></table></div></details></section>
+    <section class="panel"><div class="panel-head"><div><h2>Situação dos chamados</h2><p>Chamados abertos no período selecionado</p></div></div><div class="donut" id="rosca"></div><div class="status-list" id="situacao"></div></section>
+  </div>
+  <div class="bottom">
+    <section class="panel"><div class="panel-head list-head"><div><h2 id="titulo-lista">Chamados do período <span class="count" id="quantidade">0</span></h2><p>Consulte os detalhes e registre o atendimento</p></div><form id="pesquisa"><input type="search" id="busca" placeholder="Descrição ou usuário" maxlength="100" aria-label="Buscar por descrição ou usuário"><button class="sr-only" type="submit">Buscar</button></form></div><div class="legacy" id="legado" hidden><span></span><button class="text-button" id="ver-legados">Ver registros sem data</button></div><div class="table-scroll"><table class="call-table"><thead><tr><th>Chamado / descrição</th><th>Técnico</th><th>Status</th><th>Abertura</th><th><span class="sr-only">Detalhes</span></th></tr></thead><tbody id="chamados"><tr><td colspan="5" class="empty">Carregando chamados…</td></tr></tbody></table></div><div class="pagination"><span id="paginacao-texto">—</span><div><button id="anterior" aria-label="Página anterior" disabled>‹</button><span id="pagina">1</span><button id="proxima" aria-label="Próxima página" disabled>›</button></div></div></section>
+    <section class="panel ranking-panel"><div class="panel-head"><div><h2>Tipos mais atendidos</h2><p>Concluídos no período selecionado</p></div><span class="top-tag">TOP 5</span></div><div id="ranking"></div><p class="ranking-note">Ordenado por quantidade de atendimentos.</p></section>
+  </div>
+  </div>
+  <footer>Thindesk <span>Datas e horários de Brasília · Atualização a cada 60 segundos</span></footer>
+</main></div>
+
+<dialog id="detalhes" aria-labelledby="detalhe-titulo"><div class="dialog-head"><div><p class="eyebrow">ACOMPANHAMENTO</p><h2 id="detalhe-titulo">Detalhes do chamado</h2></div><button class="close" aria-label="Fechar detalhes">×</button></div><div id="detalhe-corpo"></div></dialog>
+<dialog id="cadastro" aria-labelledby="cadastro-titulo"><div class="dialog-head"><div><p class="eyebrow">ATENDIMENTO</p><h2 id="cadastro-titulo">Novo chamado</h2></div><button class="close" aria-label="Fechar formulário">×</button></div><form id="form-chamado"><label>Descrição<textarea name="descricao" maxlength="1000" required rows="3" autofocus></textarea></label><div class="form-grid"><label>Tipo<input name="tipo" list="tipos" maxlength="80" required></label><label>Técnico<input name="tecnico" list="tecnicos" maxlength="100" required></label></div><label>Usuário solicitante<input name="usuario" list="usuarios" maxlength="100" required></label><p class="form-error" id="cadastro-erro" role="alert" hidden></p><div class="dialog-actions"><button class="button secondary close" type="button">Voltar</button><button class="button primary" type="submit" id="salvar-chamado">Registrar chamado</button></div></form></dialog>
+<datalist id="tipos"></datalist><datalist id="tecnicos"></datalist><datalist id="usuarios"></datalist>
+<div id="toast" class="toast" role="status" hidden></div>
+</body></html>
