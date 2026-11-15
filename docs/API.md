@@ -132,3 +132,7 @@ Formato dos campos acrescentados ao chamado:
 Consultas filtradas podem retornar 400; detalhes podem retornar 404; gravações podem retornar 400, 403 e 409, além de 404 quando há identificador. Todas as consultas dependem do banco e da autenticação.
 
 O contrato de GET /chamados mudou da lista simples original para paginação. A entidade original permanece na mesma coleção.
+
+## Formulários de horários
+
+As rotas de horários são MVC: GET /ajustes-horarios abre o formulário e a lista; POST /ajustes-horarios/salvar recebe setor, diaSemana, horarioInicio e horarioFim; POST /ajustes-horarios/{id}/excluir remove um horário. Os formulários usam sessão e CSRF e redirecionam para a lista depois de salvar ou excluir. Setor é obrigatório, com até 80 caracteres. O dia deve ser selecionado entre os dias da semana. Os horários usam HH:mm e o fim deve ser posterior ao início. Erros de validação são apresentados na própria página, sem gravar dados.

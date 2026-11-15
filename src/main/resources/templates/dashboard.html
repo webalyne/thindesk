@@ -11,18 +11,7 @@
 </head>
 <body th:attr="data-pagina=${pagina}">
 <a class="skip" href="#conteudo">Ir para o conteúdo</a>
-<aside class="sidebar">
-  <a class="brand" th:href="@{/dashboard}"><span class="brand-mark">th.</span><span>thindesk<small>GESTÃO DE ATENDIMENTOS</small></span></a>
-  <div class="workspace"><span class="workspace-symbol">T</span><div>Central de suporte<small>Ambiente administrativo</small></div></div>
-  <p class="nav-caption">PRINCIPAL</p>
-  <nav aria-label="Navegação principal">
-    <a th:href="@{/dashboard}" th:classappend="${pagina == 'dashboard'} ? 'active'"><span class="nav-symbol">▦</span>Dashboard</a>
-    <a th:href="@{/chamados}" th:classappend="${pagina == 'chamados'} ? 'active'"><span class="nav-symbol">≡</span>Chamados</a>
-    <a th:href="@{/clientes}"><span class="nav-symbol">◉</span>Clientes</a>
-    <a th:href="@{/ajustes-horarios}"><span class="nav-symbol">◷</span>Horários de atendimento</a>
-  </nav>
-  <div class="sidebar-footer"><span class="avatar">AD</span><div th:text="${nomeUsuario}">Administração</div><form th:action="@{/logout}" method="post"><button type="submit" title="Sair do sistema">Sair</button></form></div>
-</aside>
+<aside th:replace="~{fragments/menu :: menu}"></aside>
 <div class="shell">
 <header class="topbar"><span>Operação <span class="divider">/</span><strong th:text="${pagina == 'chamados' ? 'Chamados' : 'Dashboard'}">Dashboard</strong></span><span id="hoje"></span></header>
 <main id="conteudo" tabindex="-1">
