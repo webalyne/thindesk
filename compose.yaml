@@ -1,0 +1,9 @@
+services:
+  mongodb:
+    image: mongo:8.0.28
+    ports:
+      - "127.0.0.1:27028:27017"
+    volumes:
+      - thindesk_mongo:/data/db
+volumes:
+  thindesk_mongo:
