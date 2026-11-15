@@ -1,0 +1,15 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"><body>
+<aside class="sidebar" th:fragment="menu">
+  <a class="brand" th:href="@{/dashboard}"><span class="brand-mark">th.</span><span>thindesk<small>GESTÃO DE ATENDIMENTOS</small></span></a>
+  <div class="workspace"><span class="workspace-symbol">T</span><div>Central de suporte<small>Ambiente administrativo</small></div></div>
+  <p class="nav-caption">PRINCIPAL</p>
+  <nav aria-label="Navegação principal">
+    <a th:href="@{/dashboard}" th:classappend="${pagina == 'dashboard'} ? 'active'"><span class="nav-symbol">▦</span>Dashboard</a>
+    <a th:href="@{/chamados}" th:classappend="${pagina == 'chamados'} ? 'active'"><span class="nav-symbol">≡</span>Chamados</a>
+    <a th:href="@{/clientes}" th:classappend="${pagina == 'clientes'} ? 'active'"><span class="nav-symbol">◉</span>Clientes</a>
+    <a th:href="@{/ajustes-horarios}" th:classappend="${pagina == 'horarios'} ? 'active'"><span class="nav-symbol">◷</span>Horários de atendimento</a>
+  </nav>
+  <div class="sidebar-footer"><span class="avatar">AD</span><div th:text="${nomeUsuario}">Administração</div><form th:action="@{/logout}" method="post"><button type="submit" title="Sair do sistema">Sair</button></form></div>
+</aside>
+</body></html>

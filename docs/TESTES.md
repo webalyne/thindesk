@@ -4,9 +4,9 @@ Execução em 15/11/2026, com Java 21.0.13, Spring Boot 3.4.13 e MongoDB 8.0.28.
 
 | Suíte | Testes | Falhas | Erros | Ignorados |
 | --- | --- | --- | --- | --- |
-| DashboardIntegrationTest | 15 | 0 | 0 | 0 |
+| DashboardIntegrationTest | 20 | 0 | 0 | 0 |
 | FiltroChamadoTest | 4 | 0 | 0 | 0 |
-| Total | 19 | 0 | 0 | 0 |
+| Total | 24 | 0 | 0 | 0 |
 
 Os relatórios originais estão em evidencias/com.pfc.thindesk.DashboardIntegrationTest.txt e evidencias/com.pfc.thindesk.FiltroChamadoTest.txt.
 
@@ -37,4 +37,12 @@ $env:TEST_MONGO_URI = "mongodb://127.0.0.1:27028"
 .\mvnw.cmd test
 ```
 
-Sem a variável, os 15 testes de integração ficam ignorados e apenas os quatro testes unitários são executados.
+Sem a variável, os 20 testes de integração ficam ignorados e apenas os quatro testes unitários são executados.
+
+## Horários e navegação
+
+As páginas Dashboard, Chamados, Clientes e Horários são renderizadas pela suíte de integração. O formulário de horários recebe o objeto esperado pelo Thymeleaf e usa as mesmas rotas do controller. O cadastro valida o dia e exige um horário final posterior ao inicial, no mesmo dia. Exclusões usam POST com CSRF. Os testes cobrem listagem, gravação, intervalo inválido, proteção CSRF e exclusão; GET não altera os registros. A página de clientes mantém a consulta dos dados cadastrados, sem links para ações inexistentes.
+
+No navegador, o ícone de horários abriu a página, um registro de teste foi cadastrado e apareceu na listagem, e sua exclusão foi confirmada. A página de clientes também foi aberta sem erro. O registro de teste foi removido depois da conferência.
+
+![Cadastro de horário conferido no navegador](evidencias/horarios.jpg)
