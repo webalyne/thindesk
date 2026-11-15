@@ -42,6 +42,7 @@ class DashboardIntegrationTest {
     void prepare() {
         assertTrue(mongo.getDb().getName().startsWith("thindesk_test_"));
         repository.deleteAll();
+        mongo.getCollection("horariosAtendimento").deleteMany(new org.bson.Document());
         openId=insert("ABERTO","Hardware","2026-11-14T12:00:00Z",null).getId();
         insert("CONCLUIDO","Rede","2026-11-14T10:00:00Z","2026-11-14T11:00:00Z");
         insert("CONCLUIDO","Rede","2026-11-13T23:00:00Z","2026-11-14T13:00:00Z");
@@ -156,4 +157,48 @@ class DashboardIntegrationTest {
             .andExpect(content().string(org.hamcrest.Matchers.containsString("Visão da operação")))
             .andExpect(content().string(org.hamcrest.Matchers.containsString("name=\"_csrf\"")));
     }
+
+    @Test
+    void todasAsPaginasDoMenuRenderizam() throws Exception {
+        for(String path:List.of("/dashboard","/chamados","/clientes","/ajustes-horarios"))
+            mvc.perform(get(path)).andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Navegação principal")));
+    }
+    @Test
+    void horarioPodeSerCadastradoEListado() throws Exception {
+        mvc.perform(post("/ajustes-horarios/salvar").with(csrf())
+            .param("setor","Financeiro").param("diaSemana","Segunda-feira")
+            .param("horarioInicio","08:00").param("horarioFim","17:00"))
+            .andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/ajustes-horarios?salvo"));
+        assertEquals(1,mongo.getCollection("horariosAtendimento").countDocuments());
+        mvc.perform(get("/ajustes-horarios")).andExpect(status().isOk())
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("Financeiro")));
+    }
+    @Test
+    void horarioComFimAnteriorAoInicioNaoEGravado() throws Exception {
+        mvc.perform(post("/ajustes-horarios/salvar").with(csrf())
+            .param("setor","Financeiro").param("diaSemana","Segunda-feira")
+            .param("horarioInicio","17:00").param("horarioFim","08:00"))
+            .andExpect(status().isOk()).andExpect(model().attributeHasFieldErrors("novoHorario","horarioFim"));
+        assertEquals(0,mongo.getCollection("horariosAtendimento").countDocuments());
+    }
+    @Test
+    void cadastroDeHorarioExigeCsrf() throws Exception {
+        mvc.perform(post("/ajustes-horarios/salvar")
+            .param("setor","Financeiro").param("diaSemana","Segunda-feira")
+            .param("horarioInicio","08:00").param("horarioFim","17:00"))
+            .andExpect(status().isForbidden());
+        assertEquals(0,mongo.getCollection("horariosAtendimento").countDocuments());
+    }
+    @Test
+    void horarioSoEExcluidoPorPostProtegido() throws Exception {
+        var horario=mongo.insert(new com.pfc.thindesk.entity.HorarioAtendimento(null,"Financeiro","Segunda-feira","08:00","17:00"));
+        String path="/ajustes-horarios/"+horario.getId()+"/excluir";
+        mvc.perform(get(path)).andExpect(status().isMethodNotAllowed());
+        assertEquals(1,mongo.getCollection("horariosAtendimento").countDocuments());
+        mvc.perform(post(path).with(csrf())).andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/ajustes-horarios?excluido"));
+        assertEquals(0,mongo.getCollection("horariosAtendimento").countDocuments());
+    }
+
 }

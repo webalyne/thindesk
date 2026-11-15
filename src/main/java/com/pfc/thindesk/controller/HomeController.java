@@ -23,7 +23,5 @@ public class HomeController {
         return "dashboard";
     }
     @GetMapping("/clientes")
-    public String clientes(Model model) { model.addAttribute("clientes",clientes.listarClientes());return "clientes"; }
-    @GetMapping("/ajustes-horarios")
-    public String horarios(Model model) { model.addAttribute("ajustes-horarios",horarios.listarTodos());return "ajustes-horarios"; }
+    public String clientes(Model model,HttpServletRequest request) { model.addAttribute("pagina","clientes"); model.addAttribute("nomeUsuario",request.getRemoteUser()); model.addAttribute("clientes",clientes.listarClientes());return "clientes"; }
 }
