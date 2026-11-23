@@ -72,6 +72,5 @@ main: versão de entrega. develop: integração. feature/api: endpoints e persis
 
 ## Apresentação
 
-Arquivo da apresentação: video/apresentacao.mp4.
+[Assistir à apresentação](video/apresentacao.mp4).
 
-Situação: vídeo pendente.
