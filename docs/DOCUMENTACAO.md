@@ -1,4 +1,4 @@
-# Thindesk - documentação do projeto
+# Thindesk - documentação técnica
 
 
 ---
@@ -7,7 +7,7 @@
 
 ## Escopo
 
-O dashboard administrativo acompanha os chamados do Thindesk. A interface consome endpoints implementados no mesmo projeto Spring Boot e usa a coleção chamados do MongoDB. O sistema original foi mantido como base.
+O dashboard administrativo acompanha os chamados do Thindesk. A interface consome endpoints implementados no mesmo projeto Spring Boot e usa a coleção chamados do MongoDB.
 
 ## Requisitos funcionais
 
@@ -38,9 +38,9 @@ Não foi realizado teste de carga nem auditoria completa de acessibilidade. O pr
 
 ## Modelo de dados
 
-A coleção chamados mantém id, descricao, status, tipo, tecnico e usuario do sistema original.
+A coleção chamados contém id, descricao, status, tipo, tecnico e usuario, além dos campos de acompanhamento descritos abaixo.
 
-| Campo acrescentado | Finalidade |
+| Campo | Finalidade |
 | --- | --- |
 | dataAbertura | Instante de criação do chamado. |
 | dataConclusao | Instante em que o atendimento é concluído. |
@@ -72,11 +72,11 @@ As coleções clientes e horariosAtendimento continuam no projeto.
 
 ## Decisões de implementação
 
-Java, Spring Boot, Thymeleaf e MongoDB mantêm a arquitetura do sistema entregue pelo professor. Os serviços do dashboard calculam os indicadores no banco, sem valores fixos na interface.
+A arquitetura do Thindesk utiliza Java, Spring Boot, Thymeleaf e MongoDB. Os serviços do dashboard calculam os indicadores no banco, sem valores fixos na interface.
 
-O dashboard usa HTML, CSS e JavaScript com gráficos SVG. A autenticação existente foi mantida, a proteção CSRF foi habilitada e as respostas de erro da API foram padronizadas.
+O dashboard usa HTML, CSS e JavaScript com gráficos SVG. A autenticação usa sessão, as escritas exigem token CSRF e a API retorna erros padronizados.
 
-O POM usa Spring Boot 3.4.13, gerenciamento central de dependências e Java 21. Não foram acrescentados outro backend ou outro banco de dados.
+O POM usa Spring Boot 3.4.13, gerenciamento central de dependências e Java 21.
 
 ## Referências
 
@@ -219,7 +219,7 @@ Formato dos campos acrescentados ao chamado:
 
 Consultas filtradas podem retornar 400; detalhes podem retornar 404; gravações podem retornar 400, 403 e 409, além de 404 quando há identificador. Todas as consultas dependem do banco e da autenticação.
 
-O contrato de GET /chamados mudou da lista simples original para paginação. A entidade original permanece na mesma coleção.
+GET /chamados retorna uma lista paginada de documentos da coleção chamados.
 
 ## Formulários de horários
 
@@ -229,6 +229,8 @@ As rotas de horários são MVC: GET /ajustes-horarios abre o formulário e a lis
 
 # Testes do Thindesk
 
+## Ambiente e resultados
+
 Execução em 15/11/2026, com Java 21.0.13, Spring Boot 3.4.13 e MongoDB 8.0.28.
 
 | Suíte | Testes | Falhas | Erros | Ignorados |
@@ -237,56 +239,52 @@ Execução em 15/11/2026, com Java 21.0.13, Spring Boot 3.4.13 e MongoDB 8.0.28.
 | FiltroChamadoTest | 4 | 0 | 0 | 0 |
 | Total | 24 | 0 | 0 | 0 |
 
-Os relatórios originais estão em evidencias/com.pfc.thindesk.DashboardIntegrationTest.txt e evidencias/com.pfc.thindesk.FiltroChamadoTest.txt.
+Relatórios de execução:
 
-## Integração
+- [Testes de integração](evidencias/com.pfc.thindesk.DashboardIntegrationTest.txt)
+- [Testes unitários](evidencias/com.pfc.thindesk.FiltroChamadoTest.txt)
 
-Os testes usam o MongoDB real e bancos temporários com prefixo thindesk_test_ e identificador aleatório. Cada teste começa com seus próprios registros. O banco temporário é removido ao final; o banco de demonstração não é alterado pela suíte.
+## Cobertura
 
-Foram verificados: autenticação, CSRF, indicadores, datas de abertura e conclusão, ranking, filtros combinados, registros sem data, períodos zerados, parâmetros inválidos, cadastro e validação, controle de versão, fluxo dos status, considerações com autor autenticado, pedido de chamado inexistente e renderização da página.
+| Área | Verificações |
+| --- | --- |
+| Autenticação | Acesso à API sem sessão retorna 401. |
+| CSRF | Escritas sem token válido retornam 403. |
+| Indicadores | Contagem por abertura, atendimentos por conclusão e cálculo do tempo médio. |
+| Série temporal | Conclusões no intervalo e preenchimento dos dias sem atendimentos. |
+| Ranking | Quantidade por tipo, considerando apenas chamados concluídos. |
+| Filtros | Combinação de status, tipo e técnico; rejeição de parâmetros inválidos ou repetidos. |
+| Registros antigos | Consulta de chamados sem data, preservando a ausência do valor histórico. |
+| Cadastro | Persistência dos campos, datas e histórico; rejeição de dados inválidos. |
+| Andamento | Transições permitidas e conflito de versões. |
+| Considerações | Persistência do texto e identificação do autor pela sessão. |
+| Recursos inexistentes | Consulta de chamado inexistente retorna 404. |
+| Navegação | Renderização de Dashboard, Chamados, Clientes e Horários. |
+| Horários | Cadastro, listagem, validação do intervalo e exclusão por POST protegido. |
 
-O cenário de datas confirma que um chamado aberto antes do período e concluído dentro dele entra na quantidade de atendimentos. O cenário de registros antigos confirma que a data permanece ausente.
+Os testes de integração utilizam bancos temporários com prefixo thindesk_test_ e identificador aleatório. Os dados são reiniciados entre cenários e o banco temporário é removido ao final. A suíte não modifica o banco de demonstração.
 
-## Interface
+## Verificações da interface
 
-Foi verificado no navegador o login, o carregamento dos indicadores, o cadastro de um chamado, o início do atendimento, o registro de uma consideração e a conclusão. O chamado permaneceu no banco após reiniciar a aplicação.
+Foram verificados no navegador: login, carregamento dos indicadores, cadastro de chamado, início do atendimento, registro de consideração, conclusão, atualização da tabela e consulta após reinício da aplicação.
 
-A verificação identificou uma falha na segunda atualização da tabela, causada pela substituição de um elemento usado na contagem. A referência foi corrigida e a atualização manual foi repetida com a lista carregada e sem aviso de erro.
+Também foram verificados a navegação para Clientes e Horários e o cadastro, a listagem e a exclusão de um horário de teste.
 
-![Dashboard em execução](evidencias/dashboard.jpg)
+![Dashboard](evidencias/dashboard.jpg)
 
-Não foi realizado teste de carga, auditoria completa de acessibilidade ou teste em múltiplos navegadores. O workflow de CI está configurado, mas sua execução remota depende da publicação.
+![Horários de atendimento](evidencias/horarios.jpg)
 
 ## Reprodução
 
-Inicie o MongoDB e configure TEST_MONGO_URI, sem o nome do banco:
+Com o MongoDB disponível, configure TEST_MONGO_URI sem o nome do banco e execute:
 
 ```powershell
 $env:TEST_MONGO_URI = "mongodb://127.0.0.1:27028"
 .\mvnw.cmd test
 ```
 
-Sem a variável, os 20 testes de integração ficam ignorados e apenas os quatro testes unitários são executados.
+Sem essa variável, os 20 testes de integração ficam ignorados e apenas os quatro testes unitários são executados.
 
-## Horários e navegação
+## Limites da verificação
 
-As páginas Dashboard, Chamados, Clientes e Horários são renderizadas pela suíte de integração. O formulário de horários recebe o objeto esperado pelo Thymeleaf e usa as mesmas rotas do controller. O cadastro valida o dia e exige um horário final posterior ao inicial, no mesmo dia. Exclusões usam POST com CSRF. Os testes cobrem listagem, gravação, intervalo inválido, proteção CSRF e exclusão; GET não altera os registros. A página de clientes mantém a consulta dos dados cadastrados, sem links para ações inexistentes.
-
-No navegador, o ícone de horários abriu a página, um registro de teste foi cadastrado e apareceu na listagem, e sua exclusão foi confirmada. A página de clientes também foi aberta sem erro. O registro de teste foi removido depois da conferência.
-
-![Cadastro de horário conferido no navegador](evidencias/horarios.jpg)
-
----
-
-# Demonstração - até 3 minutos
-
-| Tempo | Demonstração |
-| --- | --- |
-| 0:00-0:20 | Apresentar o Thindesk e entrar no sistema. |
-| 0:20-0:55 | Mostrar indicadores, gráfico de conclusões, distribuição e ranking. Alterar período e tipo. |
-| 0:55-1:40 | Cadastrar chamado, iniciar atendimento, registrar consideração e concluir. Mostrar histórico. |
-| 1:40-2:15 | Mostrar endpoints, campos de data e integração com o MongoDB. |
-| 2:15-2:45 | Mostrar os testes e justificar Spring Boot, MongoDB e controle de versão. |
-| 2:45-3:00 | Mostrar documentação e branches no repositório. |
-
-Explicar que atendidos são contados pela data de conclusão, enquanto total e distribuição usam abertura. Mostrar que os registros antigos sem datas continuam consultáveis. Usar somente dados de demonstração na gravação.
+Os resultados correspondem à execução local. Não incluem teste de carga, auditoria completa de acessibilidade ou verificação em múltiplos navegadores.
