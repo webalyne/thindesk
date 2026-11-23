@@ -1,6 +1,6 @@
 # Thindesk - dashboard administrativo
 
-Extensão do sistema fornecido pelo professor, mantendo Java, Spring Boot, Thymeleaf e MongoDB.
+Dashboard administrativo integrado ao Thindesk, com Java, Spring Boot, Thymeleaf e MongoDB.
 
 ## Execução
 
@@ -59,16 +59,18 @@ $env:TEST_MONGO_URI = "mongodb://127.0.0.1:27028"
 
 Sem TEST_MONGO_URI, apenas os testes unitários são executados; os testes de integração ficam ignorados. O workflow configura um MongoDB para executar a suíte completa.
 
-## Base original
+## Arquitetura
 
-O primeiro commit preserva o projeto do professor, com as configurações de conexão e login substituídas por variáveis de ambiente. O banco continua sendo MongoDB. A configuração Maven foi organizada com o parent Spring Boot e Java 21; as anotações JPA de Cliente foram removidas porque o projeto usa documentos MongoDB.
+A implementação estende a base do Thindesk. A API e as páginas Thymeleaf são servidas pela aplicação Spring Boot, com persistência no MongoDB. A conexão e as credenciais de acesso são configuradas por variáveis de ambiente.
 
-A listagem REST de chamados passou a retornar um objeto paginado. O contrato atualizado está em docs/API.md.
+O contrato da API está em docs/API.md.
 
 ## Gitflow
 
-main: versão de entrega. develop: integração. feature/api: endpoints e persistência. feature/dashboard: interface e testes. release/1.0.0: preparação da versão. Os commits usam mensagens curtas e minúsculas.
+main: versão de entrega. develop: integração. feature/api: endpoints e persistência. feature/dashboard: interface e testes. release/1.0.0: preparação da versão.
 
 ## Apresentação
 
-O vídeo de até três minutos ainda precisa ser gravado e incluído em video/apresentacao.mp4. O roteiro está em docs/VIDEO.md.
+Arquivo da apresentação: video/apresentacao.mp4.
+
+Situação: vídeo pendente.
