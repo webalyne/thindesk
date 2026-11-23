@@ -131,7 +131,7 @@ Formato dos campos acrescentados ao chamado:
 
 Consultas filtradas podem retornar 400; detalhes podem retornar 404; gravações podem retornar 400, 403 e 409, além de 404 quando há identificador. Todas as consultas dependem do banco e da autenticação.
 
-O contrato de GET /chamados mudou da lista simples original para paginação. A entidade original permanece na mesma coleção.
+GET /chamados retorna uma lista paginada de documentos da coleção chamados.
 
 ## Formulários de horários
 

@@ -1,5 +1,6 @@
 # Apresentação
 
-Arquivo previsto: apresentacao.mp4, com duração máxima de três minutos.
+Arquivo: apresentacao.mp4.
+Duração máxima: três minutos.
 
-O roteiro está em ../docs/VIDEO.md. Gravação pendente.
+Situação: vídeo pendente.

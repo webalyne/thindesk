@@ -2,7 +2,7 @@
 
 ## Escopo
 
-O dashboard administrativo acompanha os chamados do Thindesk. A interface consome endpoints implementados no mesmo projeto Spring Boot e usa a coleção chamados do MongoDB. O sistema original foi mantido como base.
+O dashboard administrativo acompanha os chamados do Thindesk. A interface consome endpoints implementados no mesmo projeto Spring Boot e usa a coleção chamados do MongoDB.
 
 ## Requisitos funcionais
 
@@ -33,9 +33,9 @@ Não foi realizado teste de carga nem auditoria completa de acessibilidade. O pr
 
 ## Modelo de dados
 
-A coleção chamados mantém id, descricao, status, tipo, tecnico e usuario do sistema original.
+A coleção chamados contém id, descricao, status, tipo, tecnico e usuario, além dos campos de acompanhamento descritos abaixo.
 
-| Campo acrescentado | Finalidade |
+| Campo | Finalidade |
 | --- | --- |
 | dataAbertura | Instante de criação do chamado. |
 | dataConclusao | Instante em que o atendimento é concluído. |
@@ -67,11 +67,11 @@ As coleções clientes e horariosAtendimento continuam no projeto.
 
 ## Decisões de implementação
 
-Java, Spring Boot, Thymeleaf e MongoDB mantêm a arquitetura do sistema entregue pelo professor. Os serviços do dashboard calculam os indicadores no banco, sem valores fixos na interface.
+A arquitetura do Thindesk utiliza Java, Spring Boot, Thymeleaf e MongoDB. Os serviços do dashboard calculam os indicadores no banco, sem valores fixos na interface.
 
-O dashboard usa HTML, CSS e JavaScript com gráficos SVG. A autenticação existente foi mantida, a proteção CSRF foi habilitada e as respostas de erro da API foram padronizadas.
+O dashboard usa HTML, CSS e JavaScript com gráficos SVG. A autenticação usa sessão, as escritas exigem token CSRF e a API retorna erros padronizados.
 
-O POM usa Spring Boot 3.4.13, gerenciamento central de dependências e Java 21. Não foram acrescentados outro backend ou outro banco de dados.
+O POM usa Spring Boot 3.4.13, gerenciamento central de dependências e Java 21.
 
 ## Referências
 
