@@ -39,10 +39,11 @@ Os cartões de total, abertos, andamento e a distribuição usam a **data de abe
 
 ## Documentação
 
+- [Documentação técnica completa](docs/DOCUMENTACAO.md)
+
 - [Requisitos, modelagem e decisões](docs/PROJETO.md)
 - [Endpoints, exemplos e erros](docs/API.md)
 - [Evidências de testes](docs/TESTES.md)
-- [Roteiro do vídeo](docs/VIDEO.md)
 
 ## Testes
 
