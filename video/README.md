@@ -1,6 +1,5 @@
 # Apresentação
 
-Arquivo: apresentacao.mp4.
-Duração máxima: três minutos.
+[Assistir ao vídeo](apresentacao.mp4).
 
-Situação: vídeo pendente.
+Duração: 2min 11s.
